@@ -26,8 +26,42 @@ defmodule Day2 do
       false -> 0
     end
   end
+
+  def compareIds(a, b) do
+    compareIds(String.graphemes(a), String.graphemes(b), 0, "")
+  end
+  
+  def compareIds([], [], acc, common) do {acc, common} end
+  def compareIds([a | aRest], [a | bRest], acc, common) do
+    compareIds(aRest, bRest, acc, common <> a)
+  end
+  def compareIds([_ | aRest], [_ | bRest], acc, common) do
+    compareIds(aRest, bRest, acc + 1, common)
+  end
+
+  def loop([id | ids]) do
+    result = ids
+      |> Enum.find(
+        fn b ->
+          {diff, _} = compareIds(id, b)
+          case diff do
+            1 -> true
+            _ -> false
+          end
+        end
+      )
+    case result do
+      nil -> loop(ids)
+      foundId ->
+        {_, remainingId} = compareIds(id, foundId)
+        remainingId
+    end
+  end
+
 end
 
 Day2.parse("./ids.txt")
-  |> Day2.decode
+  |> Day2.loop
   |> IO.inspect
+
+# Day2.compareIds("abcde", "axcye") |> IO.inspect
