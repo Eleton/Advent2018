@@ -65,12 +65,42 @@ defmodule Day3 do
     end
   end
 
+
+  def find_correct(result, [piece | pieces]) do
+    {id, {x, y}, {width, height}} = piece
+    if loop_column2(result, x+1, y+1, x+width, y+height),
+      do: id,
+      else: find_correct(result, pieces)
+  end
+
+  def loop_column2(result, x1, y, x2, y) do
+    if loop_row2(result, x1, y, x2),
+      do: true,
+      else: false
+  end
+  def loop_column2(result, x1, y1, x2, y2) do
+    if loop_row2(result, x1, y1, x2),
+      do: loop_column2(result, x1, y1+1, x2, y2),
+      else: false
+  end
+
+  def loop_row2(result, x, y, x) do
+    if check2(result, {x, y}),
+      do: true,
+      else: false
+  end
+  def loop_row2(result, x1, y, x2) do
+    if check2(result, {x1, y}),
+      do: loop_row2(result, x1+1, y, x2),
+      else: false
+  end
+
+  def check2(result, coords) do
+    if result[coords] == 1, do: true, else: false
+  end
 end
 
 pieces = Day3.parse("input.txt")
 Day3.loop_pieces(%{}, pieces)
-  |> Map.to_list
-  |> Enum.map(fn {_, amount} -> amount end)
-  |> Enum.filter(fn amount -> amount > 1 end)
-  |> length
+  |> Day3.find_correct(pieces)
   |> IO.inspect
